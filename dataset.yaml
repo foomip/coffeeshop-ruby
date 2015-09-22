@@ -1,0 +1,100 @@
+# Customers to be served at coffee shop
+customers:
+  Orders per customer:
+    min: 1
+    max: 5
+  Arrival variance:
+    min: 60
+    max: 200
+  Customer ordering variance:
+    min: 5
+    max: 60
+  Table customers:
+    -
+      - Zaiden Govender
+      - David Saremstein
+      - Alice dos Santos
+    -
+      - Jonathan Harris
+    -
+      - Susan MacFee
+      - Janine Mosfet
+      - Allison Smith
+      - Barbara McStuffins
+    -
+      - Joe Sumwon
+      - Gareth Stryjdom
+    -
+      - Michael Steel
+      - Katharine Upton
+    -
+      - Soren Sorenstein
+      - Renesmee Hampston
+    -
+      - Natasha Scolari
+      - Annabella Rubens
+      - Aiden Trelles
+    -
+      - Anodiwa Savu
+      - Humbe Kashonwe
+    -
+      - Mary Madubwa
+  Coffee bar customers:
+    - Joe Soap
+    - Randy Milnerton
+    - Jacob Mandla
+    - Amy Watson
+    - Alex Swarenstein
+
+total waiters: 3
+total barristas: 2
+
+# the different seating sizes of tables
+# we do not overcrowd tables in this coffee shop :)
+tables:
+  -
+    places: 2
+    total: 4
+  -
+    places: 4
+    total: 4
+  -
+    places: 6
+    total: 2
+
+# the drinks available for order and variances in preparation times
+# variance times in seconds
+drinks:
+  Cappuccino:
+    min: 30
+    max: 70
+  House blend:
+    min: 15
+    max: 45
+  Mocca java:
+    min: 40
+    max: 90
+  Espresso:
+    min: 25
+    max: 40
+  Red espresso:
+    min: 60
+    max: 100
+  Read cappuccino:
+    min: 70
+    max: 120
+  Americano:
+    min: 27
+    max: 42
+  Cafe mocha:
+    min: 60
+    max: 120
+  Decaf espresso:
+    min: 25
+    max: 40
+  Decaf house blend:
+    min: 15
+    max: 45
+  Decaf americano:
+    min: 27
+    max: 42
