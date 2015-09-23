@@ -1,14 +1,21 @@
+# all times are in seconds, change this value to affect the time speedup
+# of the sinulation - eg. 10 changes 1 sec to 100msec
+speedup factor: 1000
+
 # Customers to be served at coffee shop
 customers:
   Orders per customer:
     min: 1
     max: 5
   Arrival variance:
-    min: 60
-    max: 200
+    min: 5
+    max: 300
   Customer ordering variance:
     min: 5
     max: 60
+  Time to consume drink variance:
+    min: 300
+    max: 1200
   Table customers:
     -
       - Zaiden Govender
