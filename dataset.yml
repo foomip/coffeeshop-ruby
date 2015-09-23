@@ -45,9 +45,16 @@ customers:
     - Jacob Mandla
     - Amy Watson
     - Alex Swarenstein
+    - Frank Randall
+    - Joseph Cortana
+    - Abel Zwelinski
+    - Kurt Rosland
+    - Marcos Katz
 
 total waiters: 3
-total barristas: 2
+total baristas: 2
+
+coffee bar places: 7
 
 # the different seating sizes of tables
 # we do not overcrowd tables in this coffee shop :)

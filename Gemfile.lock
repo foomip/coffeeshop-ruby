@@ -1,13 +1,17 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    concurrent-ruby (1.0.0.pre2)
+    colorize (0.7.7)
+    concurrent-ruby (0.9.1)
+    concurrent-ruby-edge (0.1.1)
+      concurrent-ruby (~> 0.9.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  concurrent-ruby (= 1.0.0.pre2)
+  colorize
+  concurrent-ruby-edge
 
 BUNDLED WITH
    1.10.6
