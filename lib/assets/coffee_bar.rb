@@ -4,7 +4,8 @@ require 'dataset'
 
 module Assets
   class CoffeeBar < Concurrent::Actor::RestartingContext
-    attr_reader :places, :coffee_machine, :baristas
+    attr_reader :places, :coffee_machine, :baristas, :customers
+    attr_reader :waiting_for_service
 
     def self.build_coffee_bar coffee_machine, baristas
       places = Dataset.get.coffee_bar_places
@@ -13,9 +14,30 @@ module Assets
     end
 
     def initialize places, coffee_machine, baristas
-      @places         = places
-      @coffee_machine = coffee_machine
-      @baristas       = baristas
+      @places               = places
+      @coffee_machine       = coffee_machine
+      @baristas             = baristas
+      @customers            = []
+      @waiting_for_service   = []
+    end
+
+    def on_message msg
+      msg_type, message = msg
+
+      case msg_type
+      when :sit_down
+        customer = message
+
+        if customers.length >= places
+          false
+        else
+          customers << customer
+          waiting_for_service << customer
+          true
+        end
+      else
+        log "WARNING: Customer #{id} received message of type #{msg_type}: #{message} - don't know what to do??"
+      end
     end
   end
 end

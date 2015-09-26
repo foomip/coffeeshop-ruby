@@ -7,6 +7,7 @@ class Dataset
 
   attr_reader :tables, :total_waiters, :coffee_bar_places
   attr_reader :table_customers, :coffee_bar_customers, :arrival_variance
+  attr_reader :seating_variance
 
   def self.get
     if defined? @@data_set
@@ -19,7 +20,7 @@ class Dataset
   def self.load_data
     data = YAML.load_file( "#{File.expand_path(File.dirname(__FILE__))}/../dataset.yml" )
 
-    Dataset.new data
+    Dataset.new(data).freeze
   end
 
   def initialize data
@@ -30,5 +31,6 @@ class Dataset
     @table_customers      = data['customers']['Table customers']
     @coffee_bar_customers = data['customers']['Coffee bar customers']
     @arrival_variance     = generate_variance_range data['customers']['Arrival variance']
+    @seating_variance     = generate_variance_range data['customers']['Seating time variance']
   end
 end

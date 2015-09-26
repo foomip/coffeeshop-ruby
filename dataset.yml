@@ -4,6 +4,9 @@ speedup factor: 1000
 
 # Customers to be served at coffee shop
 customers:
+  Seating time variance:
+    min: 15
+    max: 60
   Orders per customer:
     min: 1
     max: 5

@@ -10,15 +10,13 @@ class Coffeeshop
   attr_reader :arrival_variance, :maitre_d
 
   def self.open_for_business
-    # waiters           = People::Waiter.hire_waiters tables
-    # coffee_machine    = Assets::CoffeeMachine.spawn(:coffee_machine_1)
-    # baristas          = People::Barista.hire_baristas coffee_machine
-    # coffee_bar        = Assets::CoffeeBar.build_coffee_bar coffee_machine, baristas
-    # coffeeshop        = Coffeeshop.new tables, maitre_d, waiters, coffee_machine,
-    #                                    coffee_bar
+    coffee_machine    = Assets::CoffeeMachine.spawn(:coffee_machine_1)
+    baristas          = People::Barista.hire_baristas coffee_machine
+    coffee_bar        = Assets::CoffeeBar.build_coffee_bar coffee_machine, baristas
     arrival_variance  = Dataset.get.arrival_variance
     tables            = Assets::Table.build_tables
-    maitre_d          = People::MaitreD.hire_maitre_d tables
+    waiters           = People::Waiter.hire_waiters tables
+    maitre_d          = People::MaitreD.hire_maitre_d tables, coffee_bar
 
     coffeeshop = Coffeeshop.new arrival_variance, maitre_d
     coffeeshop.run
@@ -40,7 +38,7 @@ class Coffeeshop
     while customers_list.length > 0
       customer = customers_list.sample
 
-      maitre_d.tell [:customer_arrived, customer]
+      maitre_d.tell [:customer_arrived, [customer, Time.now]]
 
       customers_list.delete customer
       sleep arrival_variance.sample

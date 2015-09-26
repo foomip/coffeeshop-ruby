@@ -6,7 +6,9 @@ require 'utils/streamer'
 
 module People
   class Waiter < Concurrent::Actor::RestartingContext
-    attr_reader :id, :tables
+    include PrintMessage
+
+    attr_reader :id, :tables, :msg_colour, :msg_bgcolour, :identifier
 
     def self.hire_waiters tables
       total_waiters = Dataset.get.total_waiters
@@ -27,14 +29,28 @@ module People
     end
 
     def initialize id, tables
-      @id     = id
-      @tables = tables
+      @id             = id
+      @tables         = tables
+      @msg_colour     = :light_yellow
+      @msg_bgcolour   = nil
+      @identifier     = "Waiter #{id}"
 
       add_waiter_references
     end
 
     def add_waiter_references
       @tables.each { |t| t.waiter_is self }
+    end
+
+    def on_message msg
+      msg_type, message = msg
+
+      case msg_type
+      when :customers_seated
+        log "Saw customers seated at table #{message}, engaging customers to take order"
+      else
+        log "WARNING: Waiter received message of type #{msg_type}: #{message} - don't know what to do??"
+      end
     end
   end
 end
