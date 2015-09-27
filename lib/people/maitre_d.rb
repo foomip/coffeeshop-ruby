@@ -3,14 +3,16 @@ require 'active_support/inflector'
 
 require 'dataset'
 require 'utils/print_message'
+require 'utils/people/awaiting_customers_process'
 require 'people/customer'
 
 module People
   class MaitreD < Concurrent::Actor::RestartingContext
     include PrintMessage
+    include Utils::People::AwaitingCustomersProcess
 
-    attr_reader :tables, :msg_colour, :msg_bgcolour, :identifier, :customers
-    attr_reader :seating_variance, :coffee_bar
+    attr_reader :tables, :msg_colour, :msg_bgcolour, :identifier
+    attr_reader :seating_variance, :coffee_bar, :stats
 
     def self.hire_maitre_d tables, coffee_bar
       MaitreD.spawn :maitre_d, tables, coffee_bar, Dataset.get.seating_variance
@@ -23,8 +25,8 @@ module People
       @identifier         = "Maitre'D"
       @msg_colour         = :light_blue
       @msg_bgcolour       = :default
-      @customers          = []
-      @customers_waiting  = []
+      @customers          = {}
+      @stats              = Hash.new 0
     end
 
     def on_message msg
@@ -33,11 +35,17 @@ module People
       case msg_type
       when :customer_arrived
         seat_customer message
-      when :coffee_bar_full
-        customers = [message]
-        assign_table_to customers
+        nil
+      when :try_seat_waiting_customers
+        try_seat_waiting_customers
+        nil
+      when :tired_of_waiting
+        customer = message
+        log "Customer #{customer.short_name} has grown tired of waiting for a table, leaving the coffee shop"
+        tired_of_waiting customer
+        nil
       when :coffeeshop_empty
-        false
+        @customers.keys.length == 0 && customers_waiting.length == 0
       else
         log "WARNING: Maitre D received message of type #{msg_type}: #{message} - don't know what to do??"
       end
@@ -64,29 +72,46 @@ module People
       # simulate variable time taken to get customers seated
       sleep seating_variance.sample
 
+      if customers_waiting.length > 0
+        have_waiting customers
+      else
+        table = get_table_for customers
+
+        if table
+          log "Seating #{customers.length} #{'customer'.pluralize customers.length} at table #{table.id} (table has #{table.places} #{'place'.pluralize table.places})"
+          table.seat customers
+          table.tell_waiter [:customers_seated, table.id]
+          customers.each do |v|
+            id, c = v
+            @customers[id] = c
+          end
+        else
+          have_waiting customers
+        end
+      end
+    end
+
+    def send_to_coffee_bar data, arrival_time
+      id, customer = Customer.welcome_customers(data, self, arrival_time, true).first
+
+      case customer.ask! [:find_a_seat, [coffee_bar, self]]
+      when :coffee_bar_full
+        customers = [[id, customer]]
+        assign_table_to customers
+      when :found_a_seat
+        @customers[id] = customer
+      end
+    end
+
+    def get_table_for customers
       total     = customers.length
 
-      table = tables.select do |t|
+      tables.select do |t|
         !t.occupied? && t.places >= total
 
       end.sort do |left, right|
         (left.places - total) <=> (right.places - total)
       end.first
-
-      if table
-        log "Seating #{customers.length} #{'customer'.pluralize customers.length} at table #{table.id} (table has #{table.places} #{'place'.pluralize table.places})"
-        table.seat customers
-        table.tell_waiter [:customers_seated, table.id]
-        @customers + customers
-      else
-        puts "MAITRE'D - TODO: handle case where no tables are available for customers".red
-      end
-    end
-
-    def send_to_coffee_bar data, arrival_time
-      customer = Customer.welcome_customers(data, self, arrival_time).first
-
-      customer.tell [:find_a_seat, [coffee_bar, self]]
     end
   end
 end

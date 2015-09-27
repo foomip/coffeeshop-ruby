@@ -28,13 +28,15 @@ module Assets
       when :sit_down
         customer = message
 
-        if customers.length >= places
+        if customers.length == places
           false
         else
           customers << customer
           waiting_for_service << customer
           true
         end
+      when :full
+        customers.length == places
       else
         log "WARNING: Customer #{id} received message of type #{msg_type}: #{message} - don't know what to do??"
       end

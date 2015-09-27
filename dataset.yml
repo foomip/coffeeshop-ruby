@@ -19,6 +19,12 @@ customers:
   Time to consume drink variance:
     min: 300
     max: 1200
+  Time customers will wait for table:
+    min: 900
+    max: 1800
+  Maitre'D check for space variance:
+    min: 50
+    max: 120
   Table customers:
     -
       - Zaiden Govender

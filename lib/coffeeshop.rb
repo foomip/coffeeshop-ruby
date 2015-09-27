@@ -1,3 +1,5 @@
+require 'concurrent-edge'
+
 require 'dataset'
 require 'assets/table'
 require 'assets/coffee_machine'
@@ -44,9 +46,18 @@ class Coffeeshop
       sleep arrival_variance.sample
     end
 
+    wait_for_empty_coffeeshop
+  end
+
+  def wait_for_empty_coffeeshop
     loop do
-      break if maitre_d.ask! [:coffeeshop_empty]
-      sleep 2
+      break if coffeeshop_empty?.value
     end
+  end
+
+  def coffeeshop_empty?
+    Concurrent::ScheduledTask.new(2) do
+      maitre_d.ask! [:coffeeshop_empty]
+    end.execute
   end
 end

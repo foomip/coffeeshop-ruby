@@ -42,7 +42,8 @@ module Assets
       cs = [cs] unless cs.class == Array
 
       cs.each do |c|
-        c.tell [:seated, id]
+        id, customer = c
+        customer.tell [:seated, id]
         @customers << c
       end
     end
