@@ -1,34 +1,40 @@
 # all times are in seconds, change this value to affect the time speedup
 # of the sinulation - eg. 10 changes 1 sec to 100msec
-speedup factor: 1000
+"speedup factor": 1000
+
+colours:
+  customers:    light_green
+  maitre_d:     light_blue
+  coffee_bar:   light_magento
+  barista:      light_yellow
 
 # Customers to be served at coffee shop
 customers:
-  Seating time variance:
+  "Seating time variance":
     min: 15
     max: 60
-  Orders per customer:
+  "Orders per customer":
     min: 1
     max: 5
-  Arrival variance:
+  "Arrival variance":
     min: 5
     max: 300
-  Customer ordering variance:
+  "Customer ordering variance":
     min: 5
     max: 60
-  Time to consume drink variance:
+  "Time to consume drink variance":
     min: 300
     max: 1200
-  Time customers will wait for table:
+  "Time customers will wait for table":
     min: 900
     max: 1800
-  Time customers will wait for order:
+  "Time customers will wait for order":
     min: 1200
     max: 1800
-  Maitre'D check for space variance:
+  "Maitre'D check for space variance":
     min: 50
     max: 120
-  Table customers:
+  "Table customers":
     -
       - Zaiden Govender
       - David Saremstein
@@ -70,10 +76,10 @@ customers:
     - Kurt Rosland
     - Marcos Katz
 
-total waiters: 3
-total baristas: 2
-
-coffee bar places: 7
+"total waiters": 3
+"total baristas": 2
+"total coffee machines": 1
+"total coffee bar places": 7
 
 # the different seating sizes of tables
 # we do not overcrowd tables in this coffee shop :)
