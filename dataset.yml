@@ -22,6 +22,9 @@ customers:
   Time customers will wait for table:
     min: 900
     max: 1800
+  Time customers will wait for order:
+    min: 1200
+    max: 1800
   Maitre'D check for space variance:
     min: 50
     max: 120

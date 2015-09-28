@@ -41,7 +41,6 @@ module People
         nil
       when :tired_of_waiting
         customer = message
-        log "Customer #{customer.short_name} has grown tired of waiting for a table, leaving the coffee shop"
         tired_of_waiting customer
         nil
       when :coffeeshop_empty
@@ -79,22 +78,26 @@ module People
 
         if table
           log "Seating #{customers.length} #{'customer'.pluralize customers.length} at table #{table.id} (table has #{table.places} #{'place'.pluralize table.places})"
-          table.seat customers
-          table.tell_waiter [:customers_seated, table.id]
-          customers.each do |v|
-            id, c = v
-            @customers[id] = c
-          end
+          show_customers_to_table table, customers
         else
           have_waiting customers
         end
       end
     end
 
+    def show_customers_to_table table, customers
+      table.seat customers
+      table.tell_waiter [:customers_seated, table.id]
+      customers.each do |v|
+        id, c = v
+        @customers[id] = c
+      end
+    end
+
     def send_to_coffee_bar data, arrival_time
       id, customer = Customer.welcome_customers(data, self, arrival_time, true).first
 
-      case customer.ask! [:find_a_seat, [coffee_bar, self]]
+      case customer.ask! [:find_a_seat, coffee_bar, self]
       when :coffee_bar_full
         customers = [[id, customer]]
         assign_table_to customers

@@ -39,7 +39,7 @@ module Utils
 
           if customers.length == 1 && customers[0].ask!([:prefers_coffee_bar]) && !coffee_bar.ask!([:full])
             customers_waiting.delete customers_waiting.first
-            customers[0].tell [:find_a_seat, [coffee_bar, self]]
+            customers[0].tell [:find_a_seat, coffee_bar, self]
 
             check_for_waiting_customers
           else
@@ -48,12 +48,7 @@ module Utils
             if table
               log "Seating #{customers.length} #{'customer'.pluralize customers.length} (who were waiting) at table #{table.id} (table has #{table.places} #{'place'.pluralize table.places})"
               customers_waiting.delete customers
-              table.seat customers
-              table.tell_waiter [:customers_seated, table.id]
-              customers.each do |v|
-                id, c = v
-                @customers[id] = c
-              end
+              show_customers_to_table table, customers
             else
               log 'No space to seat waiting customers yet, will check again later'
               check_for_waiting_customers
@@ -63,6 +58,8 @@ module Utils
       end
 
       def tired_of_waiting customer
+        process_stats customer
+
         stats[:tired_of_waiting] += 1
 
         customers_waiting.each do |cs|
@@ -72,6 +69,14 @@ module Utils
         @customers.delete customer.id
 
         @customers_waiting = customers_waiting.select { |cs| cs.keys.length > 0 }
+      end
+
+      def process_stats customer
+        feedback = customer.reference.ask! [:feedback]
+
+        if feedback
+          stats[feedback[:leaving_reason]] += 1
+        end
       end
     end
   end
