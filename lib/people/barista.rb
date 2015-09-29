@@ -13,7 +13,7 @@ module People
       Dataset.get.total.baristas.times.map do |i|
         logger = message_printer_setup "Barista #{i}", msg_colour
 
-        Barista.spawn "Barista #{i}", logger, coffee_machines
+        Barista.spawn "barista_#{i}".to_sym, logger, coffee_machines
       end
     end
 
@@ -26,10 +26,11 @@ module People
       msg_type, message = msg
 
       case msg_type
-      when :coffee_bar_readyzzz
+      when :coffee_bar_ready
         @coffee_bar = message
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
+        nil
       end
     end
   end

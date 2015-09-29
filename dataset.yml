@@ -1,3 +1,7 @@
+# valid log levels, highest to lowest priority
+# ERROR, WARN, INFO, DEBUG
+"log level": DEBUG
+
 # all times are in seconds, change this value to affect the time speedup
 # of the sinulation - eg. 10 changes 1 sec to 100msec
 "speedup factor": 1000

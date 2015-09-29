@@ -5,7 +5,7 @@ require 'utils/variances'
 class Dataset
   include Utils::Variances
 
-  attr_reader :speedup_factor, :colours, :customers, :total
+  attr_reader :log_level, :speedup_factor, :colours, :customers, :total, :tables
 
   def self.get
     if defined? @@data_set
@@ -22,6 +22,7 @@ class Dataset
   end
 
   def initialize data
+    @log_level        = data['log level']
     @speedup_factor   = data['speedup factor']
     @colours          = colours_struct.new(
       data['colours']['customers'].to_sym,
@@ -30,7 +31,10 @@ class Dataset
       data['colours']['barista'].to_sym
     )
     @customers        = customers_struct.new(
-      generate_variance_range( data['customers']['Arrival variance'] )
+      generate_variance_range( data['customers']['Seating time variance'] ),
+      generate_variance_range( data['customers']['Arrival variance'] ),
+      data['customers']['Table customers'],
+      data['customers']['Coffee bar customers']
     )
     @total            = total_struct.new(
       data['total waiters'],
@@ -38,10 +42,12 @@ class Dataset
       data['total coffee machines'],
       data['total coffee bar places']
     )
+    @tables           = data['tables']
   end
 
   def customers_struct
-    @customers_struct ||= Struct.new :arrival_variance
+    @customers_struct ||= Struct.new :seating_time_variance, :arrival_variance,
+      :table_customers, :coffee_bar_customers
   end
 
   def colours_struct
