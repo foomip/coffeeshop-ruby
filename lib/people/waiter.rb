@@ -35,9 +35,15 @@ module People
       msg_type, message = msg
 
       case msg_type
-      # when :customers_seated
-      #
-      #   nil
+      when :customers_seated
+        table_id, table = message
+        simulate_welcome_wait table_id, table
+        nil
+      when :welcome_customers
+        table_id, table = message
+        logger.call "Welcoming customers at table #{table_id}"
+      when :a
+        true
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         nil
@@ -53,6 +59,10 @@ module People
       end
     end
 
-    def welcome_customers
+    def simulate_welcome_wait table_id, table
+      Concurrent::ScheduledTask.new(engage_customers_variance.sample) do
+        self.reference.tell [:welcome_customers, [table_id, table]]
+      end.execute
+    end
   end
 end

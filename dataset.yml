@@ -7,7 +7,7 @@
 "speedup factor": 1000
 
 colours:
-  customers:    light_green
+  customer:     light_green
   maitre_d:     light_blue
   coffee_bar:   light_magento
   barista:      light_yellow

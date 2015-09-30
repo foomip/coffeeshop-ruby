@@ -31,7 +31,7 @@ module Assets
       case msg_type
       when :i_am_your_father
         @waiter, id = message
-        waiter.tell [:customers_seated, [id, self.reference]] if occupied?
+        waiter.tell [:customers_seated, [self.id, self.reference]] if occupied?
         nil
       when :get_id
         self.id
@@ -41,7 +41,8 @@ module Assets
         places
       when :seat_customers
         @customers = message
-        waiter.tell [:customers_seated, [id, self.reference]] if has_waiter?
+        @customers.each { |c| c.tell [:seated, self.id] }
+        waiter.tell [:customers_seated, [self.id, self.reference]] if has_waiter?
         nil
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn

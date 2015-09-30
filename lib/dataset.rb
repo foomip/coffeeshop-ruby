@@ -25,7 +25,7 @@ class Dataset
     @log_level        = data['log level']
     @speedup_factor   = data['speedup factor']
     @colours          = colours_struct.new(
-      data['colours']['customers'].to_sym,
+      data['colours']['customer'].to_sym,
       data['colours']['maitre_d'].to_sym,
       data['colours']['coffee_bar'].to_sym,
       data['colours']['barista'].to_sym,
@@ -37,7 +37,7 @@ class Dataset
       generate_variance_range( data['customers']['Arrival variance'] ),
       data['customers']['Table customers'],
       data['customers']['Coffee bar customers'],
-      data['customers']['Time waiters will take to engage customers']
+      generate_variance_range( data['customers']['Time waiters will take to engage customers'] )
     )
     @total            = total_struct.new(
       data['total waiters'],
@@ -54,7 +54,7 @@ class Dataset
   end
 
   def colours_struct
-    @colours_struct ||= Struct.new :customers, :maitre_d, :coffee_bar, :barista,
+    @colours_struct ||= Struct.new :customer, :maitre_d, :coffee_bar, :barista,
       :waiter, :table
   end
 
