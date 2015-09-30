@@ -1,12 +1,14 @@
 require 'active_support/inflector'
 require 'concurrent-edge'
 
-require 'people/customer'
+require 'utils/people_logic/seating_customers'
 require 'utils/message_printer'
 require 'dataset'
 
 module People
   class MaitreD < Concurrent::Actor::RestartingContext
+    include Utils::PeopleLogic::SeatingCustomers
+
     attr_reader :logger, :tables, :coffee_bar, :seating_time_variance
     attr_reader :customers, :waiting_customers
 
@@ -40,19 +42,6 @@ module People
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         nil
       end
-    end
-
-    def handle_table_customers names, arrival_time
-      total = names.length
-      logger.call "#{total} #{'customer'.pluralize total} arrived to be seated"
-
-      customers = People::Customer.welcome_customers names, self.reference, arrival_time
-    end
-
-    def handle_coffee_bar_customers name, arrival_time
-      logger.call "A customer for the coffee bar arrived"
-
-      customer = People::Customer.welcome_customers([name], self.reference, arrival_time).first
     end
   end
 end

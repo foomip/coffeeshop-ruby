@@ -28,13 +28,16 @@ class Dataset
       data['colours']['customers'].to_sym,
       data['colours']['maitre_d'].to_sym,
       data['colours']['coffee_bar'].to_sym,
-      data['colours']['barista'].to_sym
+      data['colours']['barista'].to_sym,
+      data['colours']['waiter'].to_sym,
+      data['colours']['table'].to_sym
     )
     @customers        = customers_struct.new(
       generate_variance_range( data['customers']['Seating time variance'] ),
       generate_variance_range( data['customers']['Arrival variance'] ),
       data['customers']['Table customers'],
-      data['customers']['Coffee bar customers']
+      data['customers']['Coffee bar customers'],
+      data['customers']['Time waiters will take to engage customers']
     )
     @total            = total_struct.new(
       data['total waiters'],
@@ -47,11 +50,12 @@ class Dataset
 
   def customers_struct
     @customers_struct ||= Struct.new :seating_time_variance, :arrival_variance,
-      :table_customers, :coffee_bar_customers
+      :table_customers, :coffee_bar_customers, :waiters_engage_customers_variance
   end
 
   def colours_struct
-    @colours_struct ||= Struct.new :customers, :maitre_d, :coffee_bar, :barista
+    @colours_struct ||= Struct.new :customers, :maitre_d, :coffee_bar, :barista,
+      :waiter, :table
   end
 
   def total_struct

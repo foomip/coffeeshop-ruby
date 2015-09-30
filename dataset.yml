@@ -11,6 +11,8 @@ colours:
   maitre_d:     light_blue
   coffee_bar:   light_magento
   barista:      light_yellow
+  waiter:       light_cyan
+  table:        light_magenta
 
 # Customers to be served at coffee shop
 customers:
@@ -38,6 +40,9 @@ customers:
   "Maitre'D check for space variance":
     min: 50
     max: 120
+  "Time waiters will take to engage customers":
+    min: 15
+    max: 900
   "Table customers":
     -
       - Zaiden Govender

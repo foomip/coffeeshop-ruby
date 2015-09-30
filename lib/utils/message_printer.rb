@@ -28,7 +28,7 @@ def message_printer_setup identifier, colour
       y = identifier.colorize(color: :white, mode: :underline)
       z = " ] #{level} - #{msg}".colorize(color: colour)
 
-      puts "#{x}#{y}#{z}"
+      print "#{x}#{y}#{z}\n"
     end
   }
 end
