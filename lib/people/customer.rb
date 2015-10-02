@@ -1,44 +1,105 @@
 require 'concurrent-edge'
 require 'securerandom'
 
+require 'dataset'
 require 'utils/message_printer'
 
 module People
   class Customer < Concurrent::Actor::RestartingContext
-    attr_reader :logger, :id, :stats, :table_id
+    attr_reader :logger, :id, :stats, :table_id, :wait_for_seating_variance
+    attr_reader :maitre_d, :prefer_coffee_bar
 
     def self.welcome_customers *args
       names, maitre_d, arrival_time, prefer_coffee_bar = args
       prefer_coffee_bar = false if prefer_coffee_bar.nil?
 
+      wait_for_seating_variance = Dataset.get.customers.customer_wait_for_seating_variance
+
       names.map do |name|
         id      = SecureRandom.uuid.gsub '-', ''
         logger  = message_printer_setup "Customer (#{name})", Dataset.get.colours.customer
 
-        Customer.spawn "customer_#{id}", logger, id
+        Customer.spawn "customer_#{id}", logger, id, wait_for_seating_variance,
+          maitre_d, prefer_coffee_bar
       end
     end
 
     def initialize *args
-      @logger, @id = args
+      @logger, @id, @wait_for_seating_variance, @maitre_d, @prefer_coffee_bar = args
 
-      @stats = Hash.new 0
+      @stats = {total_orders: 0}
 
       stats[:arrived_at] = Time.now
+
+      run_waiting_for_table
     end
 
     def on_message msg
       msg_type, message = msg
 
       case msg_type
-      when :seated_at
-        @table_id = message
-        stats[:seated_at] = Time.now
-        nil
+      when :seated
+        unless already_left?
+          @table_id = message
+          got_a_seat
+        end
+        return
+      when :find_a_seat
+        unless already_left?
+          coffee_bar = message
+
+          if coffee_bar.ask! [:give_me_a_seat, self.reference]
+            got_a_seat
+            maitre_d.tell [:seated_at_coffee_bar, self.reference]
+          else
+            logger.call "No seats available at the coffee bar, will try get a table"
+            maitre_d.tell [:coffee_bar_full, self.reference]
+          end
+        end
+        return
+      when :leaving
+        maitre_d.tell [:customer_leaving, self.reference]
+        return
+      when :prefer_coffee_bar
+        prefer_coffee_bar
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
-        nil
+        return
       end
+    end
+
+    def already_left?
+      !stats[:leaving_reason].nil?
+    end
+
+    def run_waiting_for_table
+      Concurrent::ScheduledTask.new(wait_for_seating_variance.sample) do
+        if stats[:seated_at].nil?
+          logger.call 'Tired of waiting for a seat, I\'m leaving now'
+          stats[:leaving_reason] = 'Waited too long for a seat'
+
+          self.reference.tell [:leaving]
+        end
+      end.execute
+    end
+
+    def got_a_seat
+      stats[:seated_at] = Time.now
+
+      run_waiting_for_order
+    end
+
+    def run_waiting_for_order
+      current_orders = stats[:total_orders]
+
+      Concurrent::ScheduledTask.new(wait_for_seating_variance.sample) do
+        if current_orders == stats[:total_orders]
+          logger.call 'Tired of waiting to be served, I\'m leaving now'
+          stats[:leaving_reason] = 'Waited too long to place an order'
+
+          self.reference.tell [:leaving]
+        end
+      end.execute
     end
   end
 end

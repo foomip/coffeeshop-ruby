@@ -19,30 +19,26 @@ module Utils
       def handle_coffee_bar_customers name, arrival_time
         logger.call "A customer for the coffee bar arrived", LOG_LEVEL.debug
 
-        customer = People::Customer.welcome_customers([name], self.reference, arrival_time).first
+        customer = People::Customer.welcome_customers([name], self.reference, arrival_time, true).first
+
+        send_to_coffee_bar customer, arrival_time
       end
 
       def assign_table_to customers
         # simulate variable time taken to get customers seated
         Concurrent::ScheduledTask.new(seating_time_variance.sample) do
           if waiting_customers.length > 0
-            logger.call 'TODO: Logic to handle waiting customers'
+            add_to_waiting_list customers
           else
             table = get_table_for customers
 
             if table
-              table_id      = table.ask! [:get_id]
-              table_places  = table.ask! [:get_places]
-
-              logger.call "Seating #{customers.length} #{'customer'.pluralize customers.length}" +
-                "at table #{table_id} (table has #{table_places} #{'place'.pluralize table_places})"
-
-              show_customers_to table, customers
+              seat_customers_at table, customers
             else
-              logger.call 'TODO: Logic to handle waiting customers'
+              add_to_waiting_list customers
             end
           end
-        end.execute.wait
+        end.execute.wait # <<< BAD
       end
 
       def get_table_for customers
@@ -60,6 +56,22 @@ module Utils
 
       def show_customers_to table, customers
         table.tell [:seat_customers, customers]
+      end
+
+      def send_to_coffee_bar customer, arrival_time
+        customer.tell [:find_a_seat, coffee_bar]
+      end
+
+      def seat_customers_at table, customers
+        table_id      = table.ask! [:get_id]
+        table_places  = table.ask! [:get_places]
+
+        logger.call "Seating #{customers.length} #{'customer'.pluralize customers.length} " +
+          "at table #{table_id} (table has #{table_places} #{'place'.pluralize table_places})"
+
+        show_customers_to table, customers
+
+        self.customers + customers
       end
     end
   end

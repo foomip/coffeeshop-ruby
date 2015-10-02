@@ -55,7 +55,7 @@ class Coffeeshop
         customers_list.delete customer
 
         handle_customer_arrival customers_list
-      end.execute.wait
+      end.execute.wait # << BAD
     else
       wait_for_empty_coffee_shop
     end
@@ -64,6 +64,6 @@ class Coffeeshop
   def wait_for_empty_coffee_shop
     Concurrent::ScheduledTask.new(2) do
       wait_for_empty_coffee_shop unless maitre_d.ask! [:coffeeshop_empty]
-    end.execute.wait
+    end.execute.wait # << BAD
   end
 end

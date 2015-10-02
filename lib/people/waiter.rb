@@ -38,15 +38,16 @@ module People
       when :customers_seated
         table_id, table = message
         simulate_welcome_wait table_id, table
-        nil
+        return
       when :welcome_customers
         table_id, table = message
-        logger.call "Welcoming customers at table #{table_id}"
+        # logger.call "Welcoming customers at table #{table_id}"
+        return
       when :a
         true
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
-        nil
+        return
       end
     end
 

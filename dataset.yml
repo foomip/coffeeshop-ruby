@@ -8,11 +8,11 @@
 
 colours:
   customer:     light_green
-  maitre_d:     light_blue
-  coffee_bar:   light_magento
+  maitre_d:     light_magenta
+  coffee_bar:   light_white
   barista:      light_yellow
   waiter:       light_cyan
-  table:        light_magenta
+  table:        light_blue
 
 # Customers to be served at coffee shop
 customers:
@@ -31,7 +31,7 @@ customers:
   "Time to consume drink variance":
     min: 300
     max: 1200
-  "Time customers will wait for table":
+  "Time customers will wait for seating":
     min: 900
     max: 1800
   "Time customers will wait for order":

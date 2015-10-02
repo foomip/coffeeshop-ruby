@@ -32,7 +32,7 @@ module Assets
       when :i_am_your_father
         @waiter, id = message
         waiter.tell [:customers_seated, [self.id, self.reference]] if occupied?
-        nil
+        return
       when :get_id
         self.id
       when :can_seat
@@ -43,10 +43,10 @@ module Assets
         @customers = message
         @customers.each { |c| c.tell [:seated, self.id] }
         waiter.tell [:customers_seated, [self.id, self.reference]] if has_waiter?
-        nil
+        return
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
-        nil
+        return
       end
     end
 
