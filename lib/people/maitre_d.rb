@@ -42,7 +42,7 @@ module People
         seat_at, customer_names = data
 
         handle_table_customers customer_names, arrival_time if seat_at == :table
-        handle_coffee_bar_customers customer_names, arrival_time if seat_at == :coffee_bar
+        # handle_coffee_bar_customers customer_names, arrival_time if seat_at == :coffee_bar
         return
       when :seated_at_coffee_bar
         customer = message

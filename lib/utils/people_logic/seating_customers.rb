@@ -71,7 +71,7 @@ module Utils
 
         show_customers_to table, customers
 
-        self.customers + customers
+        @customers += customers
       end
     end
   end

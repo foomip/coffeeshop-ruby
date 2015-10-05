@@ -1,3 +1,4 @@
+require 'active_support/inflector'
 require 'colorize'
 require 'concurrent-edge'
 
@@ -41,10 +42,9 @@ module People
         return
       when :welcome_customers
         table_id, table = message
-        # logger.call "Welcoming customers at table #{table_id}"
+        logger.call "Welcoming customers at table #{table_id}"
+        ask_customers_for_order table_id, table
         return
-      when :a
-        true
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return
@@ -64,6 +64,25 @@ module People
       Concurrent::ScheduledTask.new(engage_customers_variance.sample) do
         self.reference.tell [:welcome_customers, [table_id, table]]
       end.execute
+    end
+
+    def ask_customers_for_order table_id, table
+      customers = table.ask! [:get_customers]
+
+      orders = customers.reduce([]) do |os, c|
+        order = c.ask! [:what_would_you_like]
+
+        os << order unless order.nil?
+        os
+      end
+
+      if orders.length > 0
+        logger.call "Need to place #{orders.length} #{'order'.pluralize orders.length} with coffee bar"
+        puts "TODO: add logic to place orders".red
+      else
+        logger.call "No orders from table #{table_id} - will ask again later"
+        puts "TODO: add logic to ask later".red
+      end
     end
   end
 end

@@ -44,6 +44,8 @@ module Assets
         @customers.each { |c| c.tell [:seated, self.id] }
         waiter.tell [:customers_seated, [self.id, self.reference]] if has_waiter?
         return
+      when :get_customers
+        self.customers
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return

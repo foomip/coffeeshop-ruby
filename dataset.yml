@@ -43,6 +43,9 @@ customers:
   "Time waiters will take to engage customers":
     min: 15
     max: 900
+  "Time customers will wait for order to arrive":
+    min: 1800
+    max: 2700
   "Table customers":
     -
       - Zaiden Govender
@@ -106,36 +109,47 @@ tables:
 # the drinks available for order and variances in preparation times
 # variance times in seconds
 drinks:
-  Cappuccino:
+  -
+    name: "Cappuccino"
     min: 30
     max: 70
-  House blend:
+  -
+    name: "House blend"
     min: 15
     max: 45
-  Mocca java:
+  -
+    name: "Mocca java"
     min: 40
     max: 90
-  Espresso:
+  -
+    name: "Espresso"
     min: 25
     max: 40
-  Red espresso:
+  -
+    name: "Red espresso"
     min: 60
     max: 100
-  Read cappuccino:
+  -
+    name: "Read cappuccino"
     min: 70
     max: 120
-  Americano:
+  -
+    name: "Americano"
     min: 27
     max: 42
-  Cafe mocha:
+  -
+    name: "Cafe mocha"
     min: 60
     max: 120
-  Decaf espresso:
+  -
+    name: "Decaf espresso"
     min: 25
     max: 40
-  Decaf house blend:
+  -
+    name: "Decaf house blend"
     min: 15
     max: 45
-  Decaf americano:
+  -
+    name: "Decaf americano"
     min: 27
     max: 42

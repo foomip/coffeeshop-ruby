@@ -6,6 +6,7 @@ class Dataset
   include Utils::Variances
 
   attr_reader :log_level, :speedup_factor, :colours, :customers, :total, :tables
+  attr_reader :drinks
 
   def self.get
     if defined? @@data_set
@@ -39,7 +40,8 @@ class Dataset
       data['customers']['Coffee bar customers'],
       generate_variance_range( data['customers']['Time waiters will take to engage customers'] ),
       generate_variance_range( data['customers']['Time customers will wait for seating'] ),
-      generate_variance_range( data['customers']['Maitre\'D check for space variance'] )
+      generate_variance_range( data['customers']['Maitre\'D check for space variance'] ),
+      generate_variance_range( data['customers']['Orders per customer'] )
     )
     @total            = total_struct.new(
       data['total waiters'],
@@ -48,12 +50,19 @@ class Dataset
       data['total coffee bar places']
     )
     @tables           = data['tables']
+    @drinks           = data['drinks'].map do |d|
+      d.keys.reduce({}) do |x, k|
+        x[k.to_sym] = d[k]
+        x
+      end
+    end
   end
 
   def customers_struct
     @customers_struct ||= Struct.new :seating_time_variance, :arrival_variance,
       :table_customers, :coffee_bar_customers, :waiters_engage_customers_variance,
-      :customer_wait_for_seating_variance, :maitre_d_check_for_space_variance
+      :customer_wait_for_seating_variance, :maitre_d_check_for_space_variance,
+      :orders_per_customer_variance
   end
 
   def colours_struct
