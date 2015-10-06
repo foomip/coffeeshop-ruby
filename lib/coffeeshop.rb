@@ -23,7 +23,7 @@ class Coffeeshop
     baristas          = People::Barista.hire_baristas coffee_machines
     coffee_bar        = Assets::CoffeeBar.build_coffee_bar coffee_machines, baristas
     tables            = Assets::Table.build_tables
-    waiters           = People::Waiter.hire_waiters tables
+    waiters           = People::Waiter.hire_waiters tables, coffee_bar
     maitre_d          = People::MaitreD.hire_maitre_d tables, coffee_bar
     coffeeshop        = Coffeeshop.new arrival_variance, maitre_d, table_customers,
                           coffee_bar_customers

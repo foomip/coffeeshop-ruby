@@ -41,11 +41,17 @@ module Assets
         places
       when :seat_customers
         @customers = message
-        @customers.each { |c| c.tell [:seated, self.id] }
+        @customers.each { |c| c.tell [:seated, self.reference] }
         waiter.tell [:customers_seated, [self.id, self.reference]] if has_waiter?
+        return
+      when :customer_leaving
+        customer = message
+        self.customers.delete customer
         return
       when :get_customers
         self.customers
+      when :has_customers
+        occupied?
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return

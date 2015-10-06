@@ -8,10 +8,8 @@ module People
     attr_reader :logger, :coffee_machines, :coffee_bar
 
     def self.hire_baristas coffee_machines
-      msg_colour = Dataset.get.colours.barista
-
       Dataset.get.total.baristas.times.map do |i|
-        logger = message_printer_setup "Barista #{i}", msg_colour
+        logger = message_printer_setup "Barista #{i}", Dataset.get.colours.barista
 
         Barista.spawn "barista_#{i}".to_sym, logger, coffee_machines
       end

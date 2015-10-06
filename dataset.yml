@@ -43,6 +43,9 @@ customers:
   "Time waiters will take to engage customers":
     min: 15
     max: 900
+  "Amount of time between checking on customers":
+    min: 600
+    max: 1200
   "Time customers will wait for order to arrive":
     min: 1800
     max: 2700
