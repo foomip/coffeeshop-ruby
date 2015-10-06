@@ -53,6 +53,8 @@ class Dataset
     )
     @tables           = data['tables']
     @drinks           = data['drinks'].map do |d|
+      d['preparation_variance'] = generate_variance_range d
+
       d.keys.reduce({}) do |x, k|
         x[k.to_sym] = d[k]
         x
