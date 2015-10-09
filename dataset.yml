@@ -13,6 +13,7 @@ colours:
   barista:      light_yellow
   waiter:       light_cyan
   table:        light_blue
+  coffee_bar:   light_red
 
 # Customers to be served at coffee shop
 customers:
@@ -49,6 +50,12 @@ customers:
   "Time customers will wait for order to arrive":
     min: 1800
     max: 2700
+  "Barista check for orders frequency":
+    min: 600
+    max: 1200
+  "Barista check for coffee machine avilability":
+    min: 20
+    max: 45
   "Table customers":
     -
       - Zaiden Govender

@@ -98,7 +98,7 @@ module People
           run_check_back_on_customers table
         end
       else
-        logger.call "No more customers to serve a table #{table_id}"
+        logger.call "No more customers to serve at table #{table_id}"
       end
     end
 

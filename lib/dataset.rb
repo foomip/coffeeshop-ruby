@@ -43,7 +43,9 @@ class Dataset
       generate_variance_range( data['customers']['Maitre\'D check for space variance'] ),
       generate_variance_range( data['customers']['Orders per customer'] ),
       generate_variance_range( data['customers']['Time customers will wait for order to arrive'] ),
-      generate_variance_range( data['customers']['Amount of time between checking on customers'] )
+      generate_variance_range( data['customers']['Amount of time between checking on customers'] ),
+      generate_variance_range( data['customers']['Barista check for orders frequency'] ),
+      generate_variance_range( data['customers']['Barista check for coffee machine avilability'] )
     )
     @total            = total_struct.new(
       data['total waiters'],
@@ -67,7 +69,8 @@ class Dataset
       :table_customers, :coffee_bar_customers, :waiters_engage_customers_variance,
       :customer_wait_for_seating_variance, :maitre_d_check_for_space_variance,
       :orders_per_customer_variance, :wait_for_order_arrival_variance,
-      :check_on_customers_variance
+      :check_on_customers_variance, :barista_order_check_variance,
+      :barista_coffee_machine_availability_variance
   end
 
   def colours_struct

@@ -21,7 +21,7 @@ class Coffeeshop
 
     coffee_machines   = Assets::CoffeeMachine.buy_coffee_machines
     baristas          = People::Barista.hire_baristas coffee_machines
-    coffee_bar        = Assets::CoffeeBar.build_coffee_bar coffee_machines, baristas
+    coffee_bar        = Assets::CoffeeBar.build_coffee_bar coffee_machines
     tables            = Assets::Table.build_tables
     waiters           = People::Waiter.hire_waiters tables, coffee_bar
     maitre_d          = People::MaitreD.hire_maitre_d tables, coffee_bar
