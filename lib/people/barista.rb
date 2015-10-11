@@ -75,7 +75,31 @@ module People
     end
 
     def create_order coffee_machine, order_type, order
-      p order
+      create_table_order coffee_machine, order if order_type == :table
+      create_coffee_bar_order coffee_machine, order if order_type == :coffee_bar
+    end
+
+    def create_table_order coffee_machine, order
+      completed_orders = order.orders.map do |o|
+        order_info, customer = o
+
+        # so blocking a thread like this is considered bad practice
+        # we are just simulating the barista doing work, creating the
+        # order. Don't do this in real life production apps
+        sleep order_info[:preparation_variance].sample
+
+        [order_info[:name], customer]
+      end
+
+      table_id = order.table.ask! [:get_id]
+      logger.call "Finished making order for table #{table_id}"
+
+      coffee_machine.tell [:i_am_done, self.reference]
+      order.waiter.tell [:order_ready_to_serve, [completed_orders, order.table]]
+    end
+
+    def create_coffee_bar_order coffee_machine, order
+
     end
 
     def run_try_create_order order_type, order

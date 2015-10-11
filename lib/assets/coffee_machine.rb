@@ -30,6 +30,14 @@ module Assets
           @allocated_to = message
           true
         end
+      when :i_am_done
+        user = message
+        if @allocated_to == user
+          @allocated_to = nil
+        else
+          logger.call "Asked to deallocate myself by the wrong person? #{user}"
+        end
+        return
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return
