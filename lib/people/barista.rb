@@ -36,6 +36,10 @@ module People
         if [true,false].sample then tables_prioritise else coffee_bar_prioritise end
         run_checking_for_orders
         return
+      when :have_coffee_machine
+        coffee_machine, order_type, order = message
+        create_order coffee_machine, order_type, order
+        return
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return
@@ -58,7 +62,7 @@ module People
       table_order = coffee_bar.ask! [:get_table_order]
 
       if table_order
-        p table_order
+        run_try_create_order :table, table_order
         false
       else
         true
@@ -68,6 +72,25 @@ module People
     def handle_coffee_bar_orders
       print "TODO: handle orders for customers at coffee bar\n".red
       true
+    end
+
+    def create_order coffee_machine, order_type, order
+      p order
+    end
+
+    def run_try_create_order order_type, order
+      Concurrent::ScheduledTask.new(coffee_machine_availability_variance.sample) do
+        machine = coffee_machines.find do |coffee_machine|
+          coffee_machine.ask! [:need_to_use_you, self.reference]
+        end
+
+        if machine
+          logger.call 'Managed to get hold of a coffe machine to create order'
+          self.reference.tell [:have_coffee_machine, [machine, order_type, order]]
+        else
+          run_try_create_orders order_type, orders
+        end
+      end.execute
     end
 
     def run_checking_for_orders

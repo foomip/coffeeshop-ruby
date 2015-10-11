@@ -5,7 +5,7 @@ require 'utils/message_printer'
 
 module Assets
   class CoffeeMachine < Concurrent::Actor::RestartingContext
-    attr_reader :logger
+    attr_reader :logger, :allocated_to
 
     def self.buy_coffee_machines
       Dataset.get.total.coffee_machines.times.map do |i|
@@ -23,12 +23,21 @@ module Assets
       msg_type, message = msg
 
       case msg_type
-      when :a
-        return
+      when :need_to_use_you
+        if is_allocated?
+          false
+        else
+          @allocated_to = message
+          true
+        end
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return
       end
+    end
+
+    def is_allocated?
+      !allocated_to.nil?
     end
   end
 end
