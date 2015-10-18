@@ -54,6 +54,14 @@ module People
         table_id = table.ask! [:get_id]
         ask_customers_for_order table_id, table
         return
+      when :order_ready_to_serve
+        orders, table = message
+        run_ready_to_server_order_wait orders, table
+        return
+      when :server_order_to_customers
+        orders, table = message
+        serve_orders orders, table
+        return
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return
@@ -75,6 +83,13 @@ module People
       end.execute
     end
 
+    def serve_orders orders, table
+      orders.each do |o|
+        drink_name, customer = o
+        customer.tell [:here_is_your_order, drink_name]
+      end
+    end
+
     def ask_customers_for_order table_id, table
       if table.ask! [:has_customers]
         logger.call "Checking on customers at table #{table_id}"
@@ -94,7 +109,7 @@ module People
 
           run_check_back_on_customers table
         else
-          logger.call "No orders from table #{table_id} - will ask again later"
+          # logger.call "No orders from table #{table_id} - will ask again later"
           run_check_back_on_customers table
         end
       else
@@ -105,6 +120,12 @@ module People
     def run_check_back_on_customers table
       Concurrent::ScheduledTask.new(check_on_customers_variance.sample) do
         self.reference.tell [:check_on_customers, table]
+      end.execute
+    end
+
+    def run_ready_to_server_order_wait orders, table
+      Concurrent::ScheduledTask.new(engage_customers_variance.sample) do
+        self.reference.tell [:server_order_to_customers, [orders, table]]
       end.execute
     end
   end

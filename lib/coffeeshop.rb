@@ -1,4 +1,5 @@
 require 'concurrent'
+require 'colorize'
 
 require 'assets/coffee_bar'
 require 'assets/coffee_machine'
@@ -36,6 +37,7 @@ class Coffeeshop
 
   def initialize *args
     @arrival_variance, @maitre_d, @table_customers, @coffee_bar_customers = args
+    @done = false
   end
 
   def run
@@ -44,6 +46,10 @@ class Coffeeshop
     coffee_bar_customers.map { |c| [:coffee_bar, c] }
 
     handle_customer_arrival customers_list
+
+    while !@done
+      sleep 0.5
+    end
   end
 
   def handle_customer_arrival customers_list
@@ -55,7 +61,7 @@ class Coffeeshop
         customers_list.delete customer
 
         handle_customer_arrival customers_list
-      end.execute.wait # << BAD
+      end.execute
     else
       wait_for_empty_coffee_shop
     end
@@ -63,7 +69,14 @@ class Coffeeshop
 
   def wait_for_empty_coffee_shop
     Concurrent::ScheduledTask.new(2) do
-      wait_for_empty_coffee_shop unless maitre_d.ask! [:coffeeshop_empty]
-    end.execute.wait # << BAD
+      coffeeshop_empty = maitre_d.ask! [:coffeeshop_empty]
+
+      if coffeeshop_empty
+        maitre_d.ask! [:report_for_the_day]
+        @done = true
+      else
+        wait_for_empty_coffee_shop
+      end
+    end.execute
   end
 end

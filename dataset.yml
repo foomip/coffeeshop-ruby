@@ -51,11 +51,11 @@ customers:
     min: 1800
     max: 2700
   "Barista check for orders frequency":
-    min: 600
-    max: 1200
+    min: 10
+    max: 15
   "Barista check for coffee machine avilability":
-    min: 20
-    max: 45
+    min: 5
+    max: 15
   "Table customers":
     -
       - Zaiden Govender
@@ -98,8 +98,10 @@ customers:
     - Kurt Rosland
     - Marcos Katz
 
-"total waiters": 3
+"total waiters": 4
 "total baristas": 2
+# stat below would indicate how many coffees could be made at the same
+# time, and not necessarily a single physical coffee machine
 "total coffee machines": 1
 "total coffee bar places": 7
 
@@ -140,7 +142,7 @@ drinks:
     min: 60
     max: 100
   -
-    name: "Read cappuccino"
+    name: "Red cappuccino"
     min: 70
     max: 120
   -

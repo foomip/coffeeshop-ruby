@@ -55,7 +55,7 @@ module People
     end
 
     def no_waiting_orders
-      logger.call 'No waiting orders, will check again later'
+      # logger.call 'No waiting orders, will check again later'
     end
 
     def handle_table_orders
@@ -70,8 +70,25 @@ module People
     end
 
     def handle_coffee_bar_orders
-      print "TODO: handle orders for customers at coffee bar\n".red
-      true
+      ask_for_order = ->(customers) do
+        if customers.nil? || customers.length == 0
+          true
+        else
+          customer = customers.first
+
+          order = customer.ask! [:what_would_you_like]
+
+          if order
+            run_try_create_order :coffee_bar, order
+            false
+          else
+            ask_for_order.call customers[1..-1]
+          end
+        end
+      end
+
+      customers = coffee_bar.ask! [:get_customers]
+      ask_for_order.call customers
     end
 
     def create_order coffee_machine, order_type, order
@@ -98,8 +115,16 @@ module People
       order.waiter.tell [:order_ready_to_serve, [completed_orders, order.table]]
     end
 
-    def create_coffee_bar_order coffee_machine, order
+    def create_coffee_bar_order coffee_machine, order_info
+      order, customer = order_info
 
+      # so blocking a thread like this is considered bad practice
+      # we are just simulating the barista doing work, creating the
+      # order. Don't do this in real life production apps
+      sleep order[:preparation_variance].sample
+
+      coffee_machine.tell [:i_am_done, self.reference]
+      customer.tell [:here_is_your_order, order[:name]]
     end
 
     def run_try_create_order order_type, order

@@ -9,7 +9,7 @@ module People
   class Customer < Concurrent::Actor::RestartingContext
     attr_reader :logger, :id, :stats, :table_id, :wait_for_seating_variance
     attr_reader :maitre_d, :prefer_coffee_bar, :total_orders, :drinks
-    attr_reader :wait_for_order_arrival_variance, :status
+    attr_reader :wait_for_order_arrival_variance, :status, :consume_drink_variance
 
     def self.welcome_customers *args
       names, maitre_d, arrival_time, prefer_coffee_bar = args
@@ -18,6 +18,7 @@ module People
 
       wait_for_seating_variance = Dataset.get.customers.customer_wait_for_seating_variance
       wait_for_order_arrival_variance = Dataset.get.customers.wait_for_order_arrival_variance
+      consume_drink_variance = Dataset.get.customers.consume_drink_variance
 
       names.map do |name|
         id            = SecureRandom.uuid.gsub '-', ''
@@ -26,15 +27,17 @@ module People
         total_orders  = Dataset.get.customers.orders_per_customer_variance.sample
 
         Customer.spawn "customer_#{id}", logger, id, wait_for_seating_variance,
-          maitre_d, prefer_coffee_bar, total_orders, drinks, wait_for_order_arrival_variance
+          maitre_d, prefer_coffee_bar, total_orders, drinks, wait_for_order_arrival_variance,
+          consume_drink_variance
       end
     end
 
     def initialize *args
       @logger, @id, @wait_for_seating_variance, @maitre_d, @prefer_coffee_bar,
-      @total_orders, @drinks, @wait_for_order_arrival_variance = args
+      @total_orders, @drinks, @wait_for_order_arrival_variance,
+      @consume_drink_variance = args
 
-      @stats = {total_orders: 0, times_asked_for_order: 0}
+      @stats = {total_orders: 0, times_asked_for_order: 0, drinks: []}
       @status = :waiting_for_seat
 
       stats[:arrived_at] = Time.now
@@ -49,6 +52,7 @@ module People
       when :seated
         unless already_left?
           @table = message
+          stats[:customer_type] = :table
           got_a_seat
         end
         return
@@ -59,17 +63,31 @@ module People
         end
         return
       when :leaving
-        @table.tell [:customer_leaving, self.reference] unless @table.nil?
+        @table.tell [:customer_leaving, self.reference] if @table
+        @coffee_bar.tell [:customer_leaving, self.reference] if @coffee_bar
+
         maitre_d.tell [:customer_leaving, self.reference]
         return
       when :prefer_coffee_bar
         prefer_coffee_bar
       when :what_would_you_like
         if currently_busy_with_drink?
-          nil
+          return
         else
           maybe_place_order
         end
+      when :here_is_your_order
+        unless already_left?
+          drink = message
+          stats[:total_orders] += 1
+          stats[:drinks] << drink
+          @status = :drinking
+          logger.call "Just received my drink (#{drink} #{stats[:total_orders]} of #{total_orders}), going to enjoy it now"
+          run_having_my_drink
+        end
+        return
+      when :get_stats
+        self.stats
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return
@@ -81,7 +99,7 @@ module People
     end
 
     def still_want_to_order?
-      stats[:total_orders] < total_orders
+      stats[:total_orders] <= total_orders
     end
 
     def ready_to_order?
@@ -98,7 +116,9 @@ module People
         order = drinks.sample
         @status = :waiting_for_order
 
-        logger.call "Placing order with waiter - #{order[:name]}"
+        server = stats[:customer_type] == :table ? 'waiter' : 'barista'
+
+        logger.call "Placing order with #{server} - #{order[:name]}"
         run_waiting_for_order_to_arrive
         [order, self.reference]
       else
@@ -109,6 +129,8 @@ module People
 
     def try_sit_at_coffee_bar coffee_bar
       if coffee_bar.ask! [:give_me_a_seat, self.reference]
+        stats[:customer_type] = :coffee_bar
+        @coffee_bar = coffee_bar
         got_a_seat
         maitre_d.tell [:seated_at_coffee_bar, self.reference]
         run_waiting_to_be_served
@@ -158,6 +180,22 @@ module People
           stats[:leaving_reason] = 'Waited too long for order to arrive'
 
           self.reference.tell [:leaving]
+        end
+      end.execute
+    end
+
+    def run_having_my_drink
+      Concurrent::ScheduledTask.new(consume_drink_variance.sample) do
+        logger.call "Just finished having my drink (#{stats[:total_orders]} of #{total_orders})"
+
+        if stats[:total_orders] == total_orders
+          logger.call "I'm done for the day, leaving now and thanks for the service"
+          stats[:leaving_reason] = 'done for the day'
+
+          self.reference.tell [:leaving]
+        else
+          @status = :seated
+          run_waiting_to_be_served
         end
       end.execute
     end

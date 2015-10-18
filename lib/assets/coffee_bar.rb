@@ -27,7 +27,7 @@ module Assets
 
       case msg_type
       when :give_me_a_seat
-        if customers.length == places
+        if self.customers.length == places
           false
         else
           self.customers << message
@@ -41,6 +41,14 @@ module Assets
         return
       when :get_table_order
         self.waiting_orders.shift
+      when :get_customers
+        self.customers
+      when :customer_leaving
+        customer = message
+        self.customers.delete customer
+        return
+      when :get_places
+        self.places
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return

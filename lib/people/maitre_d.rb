@@ -5,6 +5,7 @@ require 'utils/people_logic/departing_customers'
 require 'utils/people_logic/seating_customers'
 require 'utils/people_logic/waiting_list'
 require 'utils/message_printer'
+require 'utils/reporting'
 require 'dataset'
 
 module People
@@ -12,6 +13,7 @@ module People
     include Utils::PeopleLogic::DepartingCustomers
     include Utils::PeopleLogic::SeatingCustomers
     include Utils::PeopleLogic::WaitingList
+    include Utils::Reporting
 
     attr_reader :logger, :tables, :coffee_bar, :seating_time_variance
     attr_reader :customers, :waiting_customers, :departed_customers
@@ -61,6 +63,9 @@ module People
         return
       when :coffeeshop_empty
         !has_customers? && !has_waiting_customers?
+      when :report_for_the_day
+        print_report_for_the_day
+        return
       else
         logger.call "Received message of type #{msg_type}: #{message} - don't know what to do??", LOG_LEVEL.warn
         return
