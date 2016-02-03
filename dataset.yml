@@ -4,7 +4,7 @@
 
 # all times are in seconds, change this value to affect the time speedup
 # of the sinulation - eg. 10 changes 1 sec to 100msec
-"speedup factor": 1000
+"speedup factor": 500
 
 colours:
   customer:     light_green
@@ -20,42 +20,54 @@ customers:
   "Seating time variance":
     min: 15
     max: 60
+    median: 20
   "Orders per customer":
     min: 1
     max: 5
+    median: 1
   "Arrival variance":
     min: 5
     max: 300
+    median: 100
   "Customer ordering variance":
     min: 5
     max: 60
+    median: 32
   "Time to consume drink variance":
     min: 300
     max: 1200
+    median: 900
   "Time customers will wait for seating":
     min: 900
     max: 1800
   "Time customers will wait for order":
     min: 1200
     max: 1800
+    median: 1400
   "Maitre'D check for space variance":
     min: 50
     max: 120
+    median: 60
   "Time waiters will take to engage customers":
     min: 15
     max: 900
+    median: 40
   "Amount of time between checking on customers":
     min: 600
     max: 1200
+    median: 900
   "Time customers will wait for order to arrive":
     min: 1800
     max: 2700
+    median: 2100
   "Barista check for orders frequency":
     min: 10
     max: 15
+    median: 12
   "Barista check for coffee machine avilability":
     min: 5
     max: 15
+    median: 10
   "Table customers":
     -
       - Zaiden Govender
@@ -99,10 +111,10 @@ customers:
     - Marcos Katz
 
 "total waiters": 4
-"total baristas": 2
+"total baristas": 5
 # stat below would indicate how many coffees could be made at the same
 # time, and not necessarily a single physical coffee machine
-"total coffee machines": 1
+"total coffee machines": 4
 "total coffee bar places": 7
 
 # the different seating sizes of tables
@@ -125,43 +137,54 @@ drinks:
     name: "Cappuccino"
     min: 30
     max: 70
+    median: 35
   -
     name: "House blend"
     min: 15
     max: 45
+    median: 20
   -
     name: "Mocca java"
     min: 40
     max: 90
+    median: 60
   -
     name: "Espresso"
-    min: 25
-    max: 40
+    min: 10
+    max: 20
+    median: 15
   -
     name: "Red espresso"
-    min: 60
+    min: 20
     max: 100
+    median: 40
   -
     name: "Red cappuccino"
-    min: 70
-    max: 120
+    min: 40
+    max: 80
+    median: 65
   -
     name: "Americano"
-    min: 27
-    max: 42
+    min: 15
+    max: 30
+    median: 19
   -
     name: "Cafe mocha"
-    min: 60
+    min: 30
     max: 120
+    median: 100
   -
     name: "Decaf espresso"
-    min: 25
-    max: 40
+    min: 10
+    max: 20
+    median: 15
   -
     name: "Decaf house blend"
-    min: 15
+    min: 10
     max: 45
+    median: 30
   -
     name: "Decaf americano"
-    min: 27
-    max: 42
+    min: 10
+    max: 45
+    median: 20

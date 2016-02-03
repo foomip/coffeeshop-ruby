@@ -12,6 +12,8 @@ GEM
     concurrent-ruby-edge (0.2.0.pre2)
       concurrent-ruby (~> 1.0.0.pre2)
     diff-lcs (1.2.5)
+    distribution (0.7.3)
+    gsl (1.16.0.6)
     i18n (0.7.0)
     json (1.8.3)
     minitest (5.8.1)
@@ -40,8 +42,10 @@ DEPENDENCIES
   activesupport
   colorize
   concurrent-ruby-edge (= 0.2.0.pre2)
+  distribution
+  gsl
   rspec
   terminal-table
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

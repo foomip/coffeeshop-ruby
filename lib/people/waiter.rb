@@ -19,7 +19,7 @@ module People
         puts 'WARNING: simulation run has more waiters than tables'.red
       end
 
-      tables.zip((0...total_waiters).to_a.lazy.cycle).group_by { |x| x[1] }.map do |y|
+      tables.zip((0...total_waiters).lazy.cycle).group_by { |x| x[1] }.map do |y|
         id = y[0]
         tables = y[1].map { |x| x[0]  }
         logger = message_printer_setup "Waiter #{id}", Dataset.get.colours.waiter
